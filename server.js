@@ -1,67 +1,33 @@
 const http = require('http');
+const mysql = require('mysql2');
+const queryAllCustomers = "SELECT * FROM customers";
 const PORT = 3000;
-const mysql = require('mysql');
 
-const query = "SELECT * FROM pokemon";
+const con = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "root",
+    database: "sftp_test"
+});
 
-const server = http.createServer((req, res) =>{
-    console.log('Server request');
-    console.log(req.url, req.method);
-
+http.createServer(async (req, res) => {
     res.writeHead(200, {'Content-Type': 'application/json'});
+    res.end(JSON.stringify(await getAllCustomers()));
 
+}).listen(PORT, 'localhost', (error) => {
+    error ? console.log(error) : console.log("Listening port 3000");
+});
 
-    const connection = mysql.createConnection({
-        host: "localhost",
-        user: "root",
-        database: "test",
-        password: "root"
-    });
-
-    connection.connect( err => {
-        if (err) {
-            console.log(err);
-            return err
-        } else {
-            console.log("Database works");
-        }
-    });
-
-    (async function (){
-        let promise = new Promise((resolve, reject) => {
-            connection.query(query, function (err, results) {
-                if (err) console.log(err);
-                resolve(results);
-            });
+function getAllCustomers() {
+    const data = new Promise((resolve, reject)=>{
+        con.query(queryAllCustomers,  (error, results)=>{
+            if(error){
+                return reject(error);
+            }
+            return resolve(results);
         });
-        let result = await promise;
-        sendResponse(result);
-        connection.end();
-    })();
+    });
 
-    // Second version of async code
-
-    // let promise = new Promise((resolve, reject) => {
-    //     connection.query(query, function (err, results) {
-    //         if (err) console.log(err);
-    //         resolve(results);
-    //     });
-    // })
-    // promise.then(result => {
-    //     sendResponse(result);
-    //     connection.end();
-    // });
-
-    function sendResponse (response){
-        res.write(JSON.stringify(response));
-        res.end();
-    }
-});
-
-server.listen(PORT, 'localhost', (error) =>{
-    error ? console.log(error): console.log("Listening port 3000");
-});
-
-
-
-
+    con.end();
+    return data;
+};
