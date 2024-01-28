@@ -17,7 +17,7 @@
 
 .inner-wrapper{
     background-color: rgba(56, 51, 51, 0.19);
-    height: 55rem;
+    height: 98%;
     display: flex;
     border-radius: 1.5rem;
 }
@@ -43,12 +43,23 @@
     text-align: center;
 }
 
+.hiddenElement{
+    position: relative;
+    width: 0.1px;
+    height: 0.1px;
+    z-index: -1;
+    opacity: 0;
+    overflow: hidden;
+    top: -10px;
+}
+
 form{
     text-align: center;
+    height: 100%;
 }
 
 .title{
-    height: 10%;
+    height: 7%;
     margin: 2% auto 0;
     width: 60%;
 }
@@ -61,10 +72,10 @@ form{
 .main-image{
     width: 90%;
     margin: 2% auto 0;
-    height: 12%;
+    height: 7%;
 }
 
-.image-input {
+.image-input, .main-image-input {
     width: 0.1px;
     height: 0.1px;
     opacity: 0;
@@ -85,10 +96,6 @@ form{
     color: gray;
 }
 
-.label p{
-    margin-top: 7%;
-}
-
 .label:hover {
     color: white;
     background: #333;
@@ -97,7 +104,7 @@ form{
 .description{
     width: 90%;
     margin: 2% auto 0;
-    height: 10%;
+    height: 6%;
 }
 
 .description input{
@@ -109,7 +116,7 @@ form{
     display: flex;
     margin: 2% auto 0;
     width: 90%;
-    height: 10%;
+    height: 7%;
 }
 
 .weakness-inner-wrapper, .type-inner-wrapper{
@@ -145,10 +152,11 @@ form{
 /*Weakness dropdown section*/
 
 .weakness-dropdown, .type-dropdown{
-    position: absolute;
+    position: relative;
     display: none;
     margin-left: 1%;
-    width: 7%;
+    width: 70%;
+    margin-left: 10%;
 }
 
 .weakness-drop-el, .type-drop-el, .gender-drop-el, .category-drop-el, .abilities-drop-el{
@@ -186,7 +194,7 @@ form{
 .evolution-forms{
     width: 90%;
     margin: 2% auto 0;
-    height: 30%;
+    height: 20%;
 }
 
 .evolution-form-inner-wrapper{
@@ -196,7 +204,7 @@ form{
 }
 
 .evolution-form-wrapper{
-    height: 90%;
+    height: 100%;
 }
 
 .evolution-form{
@@ -212,14 +220,15 @@ form{
 }
 
 .remove-evolution-form{
-    /*padding-top: 1%;*/
+    margin-top: 1%;
     height: 20%;
     cursor: pointer;
     align-items: center;
     align-content: center;
+    height: 22%;
 }
 
-.evolution-forms input{
+.evolution-form-name{
     width: 90%;
     height: 90%;
 }
@@ -251,7 +260,7 @@ form{
     display: flex;
     width: 90%;
     margin: 1% auto 0;
-    height: 23%;
+    height: 17%;
 }
 
 .parameter-left-side, .parameter-right-side{
@@ -295,19 +304,19 @@ form{
 
 /*gender dropdown*/
 .gender-dropdown, .category-dropdown, .abilities-dropdown{
-    position: absolute;
+    position: relative;
     display: none;
     margin-left: 1%;
-    width: 7%;
+    width: 70%;
 }
 
 .attributes{
-    height: 27%;
+    height: 23%;
     margin: 1% auto;
     display: flex;
     width: 90%;
     font-size: 1rem;
-    align-items: center;
+    /*align-items: center;*/
     border: 0;
     background-color: rgba(171, 11, 11, 0);
     font-weight: 600;
@@ -315,21 +324,22 @@ form{
 
 .attribute-column{
     width: 13%;
-    margin: 1% 0 0 5%;
+    /*margin: 1% 0 0 5%;*/
+    margin-left: 5%;
     height: 100%;
-    text-align: center;
+    /*text-align: center;*/
 }
 
 .attribute-name{
-    height: 15%;
+    height: 17%;
     width: 100%;
-    margin-top: 10%;
+    /*margin-top: 10%;*/
 }
 
 .attribute-number{
     width: 100%;
-    margin-top: 20%;
-    height: 90%;
+    /*margin-top: 20%;*/
+    height: 80%;
 }
 
 .hp{
@@ -346,4 +356,9 @@ form{
     background-color: #D9D9D9;
     box-shadow: inset 0px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 8px;
+}
+
+.submit-button{
+    float: right;
+    margin-right: 5%;
 }

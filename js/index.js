@@ -1,9 +1,7 @@
-localStorage.name = "Roma"
-
 
 // Input files
-let pokemonMainImageInput = document.querySelector('#pokemon-main-image-input');
-let pokemonMainImageLabel = document.querySelector('#pokemon-main-image-label');
+const pokemonMainImageInput = document.querySelector('#pokemon-main-image-input');
+const pokemonMainImageLabel = document.querySelector('#pokemon-main-image-label');
 
 // Uploading images
 
@@ -49,9 +47,11 @@ document.querySelectorAll(".dropdown-arrow").forEach(e => {
                     }
                     e.classList.add(`${clickedButton}-chosen`);
                     e.classList.remove(`${clickedButton}-not-chosen`);
+                    getDataFromChosenFields(clickedButton);
                 } else if (e.classList.contains(`${clickedButton}-chosen`)){
                     e.classList.add(`${clickedButton}-not-chosen`);
                     e.classList.remove(`${clickedButton}-chosen`);
+                    getDataFromChosenFields(clickedButton);
                 }
             })
         });
@@ -90,38 +90,24 @@ function isLimitReached (inputElement){
 
 let listOfChosenAttribute = [];
 
-// The list should have a key-value structure
-let listOfAttributeValues = [];
-
 document.querySelectorAll(".attribute-level").forEach(e => {
     e.addEventListener("mouseover", showAttributeLevel);
     e.addEventListener("mouseout", removeAttributeLevel);
+    e.addEventListener("click", setAttribute);
 });
 
+let currentAttribute;
+let currentLevel;
 
 function showAttributeLevel(){
-    let currentAttribute = this.classList.item(0);
-    let currentLevel = this.classList.item(2).split("-")[1];
+
+    currentAttribute = this.classList.item(0);
+    currentLevel = this.classList.item(2).split("-")[1];
 
     listOfChosenAttribute = document.querySelectorAll(`.${currentAttribute}`);
-    listOfChosenAttribute.forEach(e =>{
-        e.addEventListener("click", setAttribute);
-    })
 
     for (let i = 1; i <= +currentLevel; i++){
         document.querySelector(`.${currentAttribute}-${i}`).style.background = "rgba(51, 0, 255, 0.47)";
-    }
-    function setAttribute(){
-        // removeAttributeLevel();
-
-        for (let i = 1; i <= +currentLevel; i++){
-            document.querySelector(`.${currentAttribute}-${i}`).style.background = "rgba(51, 0, 255, 0.47)";
-        }
-
-        for (let i = 0; i < listOfChosenAttribute.length; i++){
-            listOfChosenAttribute[i].removeEventListener("mouseout", removeAttributeLevel);
-            listOfChosenAttribute[i].removeEventListener("mouseover", showAttributeLevel);
-        }
     }
 }
 
@@ -129,6 +115,19 @@ function removeAttributeLevel(){
     for (let i = 0; i < listOfChosenAttribute.length; i++){
         listOfChosenAttribute[i].style.background = "#D9D9D9";
         listOfChosenAttribute[i].style.boxShadow = "inset 0px 4px 4px rgba(0, 0, 0, 0.25)";
+    }
+}
+
+function setAttribute(){
+    for (let i = 1; i <= +currentLevel; i++){
+        document.querySelector(`.${currentAttribute}-${i}`).style.background = "rgba(51, 0, 255, 0.47)";
+    }
+    document.getElementsByName(currentAttribute)[0].value = currentLevel; // Insert values into form inputs
+
+    for (let i = 0; i < listOfChosenAttribute.length; i++){
+        listOfChosenAttribute[i].removeEventListener("mouseout", removeAttributeLevel);
+        listOfChosenAttribute[i].removeEventListener("mouseover", showAttributeLevel);
+        listOfChosenAttribute[i].removeEventListener("click", setAttribute);
     }
 }
 
@@ -172,9 +171,12 @@ document.querySelector(".add-one-more-form-button").addEventListener("click", ()
 
             let titleInput = document.createElement("input");
             titleInput.type = "text";
+            titleInput.name = `${formNumber}Title`;
             titleInput.placeholder = "Evolution form name";
             titleInput.classList.add("primary");
+            titleInput.classList.add("evolution-form-name");
             titleInput.id = `${formNumber}-evolution-form-name`;
+            titleInput.required = true;
 
             formTitle.appendChild(titleInput);
             return formTitle;
@@ -192,9 +194,11 @@ document.querySelector(".add-one-more-form-button").addEventListener("click", ()
 
             pictureInput.type = "file";
             pictureInput.id = `evolution-form-image-input-${formNumber}`;
+            pictureInput.name =`${formNumber}Image`;
             pictureInput.classList.add("primary");
             pictureInput.classList.add("image-input");
             pictureInput.classList.add(`${formNumber}-image-input`);
+            pictureInput.required = true;
 
             pictureLabel.htmlFor = `evolution-form-image-input-${formNumber}`;
             pictureLabel.id = `evolution-form-image-label-${formNumber}`;
@@ -225,7 +229,42 @@ document.querySelector(".add-one-more-form-button").addEventListener("click", ()
 
         return removeFormButton
     }
-})
+});
 
+document.querySelector(".form").addEventListener("submit", sendData);
 
+async function sendData(e){
+    e.preventDefault();
 
+    getDataFromChosenFields("weakness");
+    getDataFromChosenFields("type");
+    getDataFromChosenFields("gender");
+    getDataFromChosenFields("category");
+    getDataFromChosenFields("abilities");
+
+    let formData = new FormData(document.querySelector(".form"));
+
+    let response = await fetch('http://localhost:3000',{
+        method: 'POST',
+        mode: "no-cors",
+        body: formData
+    })
+    let result = await response;
+    console.log(result);
+
+}
+
+// Receive data from dropdowns
+
+function getDataFromChosenFields(targetElement){
+    document.getElementsByName(targetElement)[0].value = "";
+    document.querySelectorAll(`.${targetElement}-chosen`).forEach(e =>{
+        document.getElementsByName(targetElement)[0].value += e.classList.item(0) + " ";
+    });
+}
+
+// TO DO
+//  window onclick to remove dropdowns
+//  refresh attributes
+// refresh the page after sending the form
+// favicon
