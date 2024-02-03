@@ -156,14 +156,13 @@ form{
     display: none;
     margin-left: 1%;
     width: 70%;
-    margin-left: 10%;
+    margin-left: 7%;
 }
 
 .weakness-drop-el, .type-drop-el, .gender-drop-el, .category-drop-el, .abilities-drop-el{
-    border-radius: 1rem;
-    border: 0.1rem solid red;
+    border-radius: 0.5rem;
+    border: 0.1rem solid black;
     font-size: 1.5rem;
-    background-color: beige;
 }
 
 .weakness-drop-el:hover,
@@ -171,7 +170,7 @@ form{
 .gender-drop-el:hover,
 .category-drop-el:hover,
 .abilities-drop-el:hover{
-    background-color: yellow;
+    background-color: rgba(198, 166, 186, 100%);
     cursor: pointer;
 }
 
@@ -180,7 +179,7 @@ form{
 .gender-chosen,
 .category-chosen,
 .abilities-chosen{
-    background-color: red;
+    background-color: rgba(119, 83, 190, 100%);
 }
 
 .weakness-not-chosen,
@@ -188,7 +187,7 @@ form{
 .gender-not-chosen,
 .category-not-chosen,
 .abilities-not-chosen{
-    background-color: beige;
+    background-color: rgb(217, 217, 217, 100%);
 }
 
 .evolution-forms{
@@ -348,7 +347,6 @@ form{
 
 .attribute-level{
     cursor: pointer;
-    /*background-color: whitesmoke;*/
     width: 100%;
     height: 5%;
     margin-top: 12%;
@@ -358,7 +356,39 @@ form{
     border-radius: 8px;
 }
 
+.buttons{
+    display: flex;
+    margin: 0 auto;
+    width: 90%;
+}
+
+.backToPokedex{
+    margin-left: 10%;
+    width: 15%;
+    font-family: Josefin Slab;
+    font-size: 1.3rem;
+}
+
 .submit-button{
+    margin-right: 0%;
     float: right;
-    margin-right: 5%;
+    margin-left: 60%;
+}
+
+.submit-form {
+    width: 5.2rem;
+    height: 1.6rem;
+    background: rgba(217, 217, 217, 0.51);
+    border: 1px solid #D49997;
+    box-shadow: inset 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 27px;
+    cursor: pointer;
+    padding-top: 0.2rem;
+    font-family: Josefin Slab;
+    font-size: 1.2rem;
+}
+
+.submit-form:hover{
+    background-color: rgba(119, 83, 190, 100%);
+    color: whitesmoke;
 }

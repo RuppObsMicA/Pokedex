@@ -4,11 +4,13 @@ const mysql = require('mysql');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 
+
 const express = require('express');
 
 let queryToInsertIntoPokemons;
 let queryToInsertIntoEvolution;
 let queryToInsertIntoSkills;
+let queryToGetDataFromDB;
 
 const app = express();
 
@@ -64,7 +66,6 @@ app.post("/", upload.any(), (req, res) => {
     }
 
         async function insertDataIntoDB(){
-            let numberOfEvolutionForms = 1;
 
             queryToInsertIntoPokemons = `INSERT INTO pokemons (Title, Image, Description, Weaknesses, Types, Height, Weight, Gender, Category, Abilities)
                         VALUES ("${req.body.title}", "${req.files[0].filename}", "${req.body.description}", "${req.body.weakness}", "${req.body.type}",
@@ -72,10 +73,16 @@ app.post("/", upload.any(), (req, res) => {
 
             await insertDataIntoDB(queryToInsertIntoPokemons);
 
-            let IdOfCurrentPokemon = await getIdOfCurrentPokemon(`SELECT Id FROM pokemons WHERE Title ="${req.body.title}"`);
+            let IdOfCurrentPokemon = await getIdOfCurrentPokemon(`SELECT Id FROM pokemons WHERE Title = "${req.body.title}"`);
 
-            queryToInsertIntoEvolution = `INSERT INTO evolution (Id, Name, Image) 
-                        VALUES ("${IdOfCurrentPokemon[0].Id}", "${req.body.firstTitle}", "${req.files[numberOfEvolutionForms].filename}")`;
+            if (req.files.length > 2){
+                queryToInsertIntoEvolution = `INSERT INTO evolution (Id, EvolutionName, EvolutionImage, SecondEvolutionName, SecondEvolutionImage)
+                        VALUES ("${IdOfCurrentPokemon[0].Id}", "${req.body.firstTitle}", "${req.files[1].filename}", "${req.body.secondTitle}", "${req.files[2].filename}")`;
+            } else {
+                queryToInsertIntoEvolution = `INSERT INTO evolution (Id, EvolutionName, EvolutionImage) 
+                        VALUES ("${IdOfCurrentPokemon[0].Id}", "${req.body.firstTitle}", "${req.files[1].filename}")`;
+            }
+
 
             queryToInsertIntoSkills = `INSERT INTO skills (Id, Hp, Attack, Defense, SpecialAttack, SpecialDefense, Speed) 
                         VALUES ("${IdOfCurrentPokemon[0].Id}", "${req.body.hp}", "${req.body.attack}", "${req.body.defense}", "${req.body.specialAttack}", "${req.body.specialDefense}", "${req.body.speed}")`;
@@ -83,12 +90,6 @@ app.post("/", upload.any(), (req, res) => {
             await insertDataIntoDB(queryToInsertIntoSkills);
             await insertDataIntoDB(queryToInsertIntoEvolution);
 
-            if (req.files.length > 2){
-                numberOfEvolutionForms = 2;
-                queryToInsertIntoEvolution = `INSERT INTO evolution (Id, Name, Image) 
-                        VALUES ("${IdOfCurrentPokemon[0].Id}", "${req.body.secondTitle}", "${req.files[numberOfEvolutionForms].filename}")`;
-                await insertDataIntoDB(queryToInsertIntoEvolution);
-            }
 
             async function insertDataIntoDB(query){
                 let promiseDB = new Promise((resolve, reject) => { // Process reject
@@ -122,7 +123,43 @@ app.post("/", upload.any(), (req, res) => {
 });
 
 app.get("/", (req, res) => {
-    res.send("Hello");
+
+    const connection = mysql.createConnection({
+        host: "localhost",
+        user: "root",
+        database: "pokedex",
+        password: "root"
+    });
+
+    connection.connect(err => {
+        if (err) {
+            console.log(err);
+            return err
+        } else {
+            console.log("Database works");
+        }
+    });
+
+    queryToGetDataFromDB = "SELECT * FROM pokemons INNER JOIN skills ON pokemons.Id=skills.Id RIGHT JOIN evolution ON pokemons.ID=evolution.Id";
+
+        (async function () {
+            let promise = new Promise((resolve, reject) => {
+                connection.query(queryToGetDataFromDB, function (err, results) {
+                    if (err) console.log(err);
+                    resolve(results);
+                });
+            });
+            let result = await promise;
+            sendResponse(result);
+            connection.end();
+        })();
+
+    function sendResponse(response) {
+            res.setHeader("Access-Control-Allow-Origin", "*");
+            res.send(JSON.stringify(response));
+            console.log("Sent")
+            res.end();
+    }
 });
 
 app.listen(PORT, (error) => {
@@ -132,7 +169,6 @@ app.listen(PORT, (error) => {
 // server.listen(PORT, 'localhost', (error) =>{
 //     error ? console.log(error): console.log("Listening port 3000");
 // });
-
 
 
 // const server = http.createServer((req, res) => {
@@ -154,7 +190,7 @@ app.listen(PORT, (error) => {
 //     });
 //
 //     if (req.method === "GET") {
-//        query = "SELECT * FROM req.bodys";
+//        query = "SELECT * FROM pokemons";
 //         (async function () {
 //             let promise = new Promise((resolve, reject) => {
 //                 connection.query(query, function (err, results) {
