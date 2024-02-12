@@ -1,11 +1,10 @@
-const http = require('http');
 const PORT = 3000;
 const mysql = require('mysql');
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
-
-
+const upload = multer({dest: "uploads/"});
 const express = require('express');
+const fs = require('fs');
+
 
 let queryToInsertIntoPokemons;
 let queryToInsertIntoEvolution;
@@ -32,9 +31,6 @@ app.post("/", upload.any(), (req, res) => {
         }
     });
 
-    // console.log(req.files);
-    // console.log(req.body);
-
     (async function (){
         if(await isThePokemonAlreadyExist()){
             console.log("The pokemon Exist");
@@ -48,12 +44,16 @@ app.post("/", upload.any(), (req, res) => {
         }
     })();
 
+    req.files[0].file;
+
     async function isThePokemonAlreadyExist(){
         let query = `SELECT Id FROM pokemons WHERE Title = "${req.body. title}"`;
 
-        let promiseDB = new Promise((resolve, reject) => { // Process reject
+        let promiseDB = new Promise((resolve, reject) => {
             connection.query(query, (err, results) => {
-                if (err) console.log(err);
+                if (err) {
+                    reject(err);
+                }
                 console.log("Check complete");
                 if (Object.keys(results).length === 0){
                     resolve(false)
@@ -83,18 +83,18 @@ app.post("/", upload.any(), (req, res) => {
                         VALUES ("${IdOfCurrentPokemon[0].Id}", "${req.body.firstTitle}", "${req.files[1].filename}")`;
             }
 
-
             queryToInsertIntoSkills = `INSERT INTO skills (Id, Hp, Attack, Defense, SpecialAttack, SpecialDefense, Speed) 
                         VALUES ("${IdOfCurrentPokemon[0].Id}", "${req.body.hp}", "${req.body.attack}", "${req.body.defense}", "${req.body.specialAttack}", "${req.body.specialDefense}", "${req.body.speed}")`;
 
             await insertDataIntoDB(queryToInsertIntoSkills);
             await insertDataIntoDB(queryToInsertIntoEvolution);
 
-
             async function insertDataIntoDB(query){
-                let promiseDB = new Promise((resolve, reject) => { // Process reject
+                let promiseDB = new Promise((resolve, reject) => {
                     connection.query(query, (err, results) => {
-                        if (err) console.log(err);
+                        if (err){
+                            reject(err);
+                        }
                         console.log("Added data into DB");
                         resolve(results);
                     });
@@ -103,9 +103,11 @@ app.post("/", upload.any(), (req, res) => {
             }
 
             async function getIdOfCurrentPokemon(query){
-                let promiseDB = new Promise((resolve, reject) => { // Process reject
+                let promiseDB = new Promise((resolve, reject) => {
                     connection.query(query, (err, results) => {
-                        if (err) console.log(err);
+                        if (err) {
+                            reject(err)
+                        }
                         console.log("Id was received");
                         resolve(results);
                     });
@@ -115,7 +117,8 @@ app.post("/", upload.any(), (req, res) => {
                 return result
             }
 
-            res.send("Successful adding")
+
+            res.send("Successful adding");
             res.end();
             connection.end();
             console.log("Closed connection");
@@ -142,17 +145,65 @@ app.get("/", (req, res) => {
 
     queryToGetDataFromDB = "SELECT * FROM pokemons INNER JOIN skills ON pokemons.Id=skills.Id RIGHT JOIN evolution ON pokemons.ID=evolution.Id";
 
-        (async function () {
-            let promise = new Promise((resolve, reject) => {
-                connection.query(queryToGetDataFromDB, function (err, results) {
-                    if (err) console.log(err);
-                    resolve(results);
-                });
+    (async function () {
+        let promise = new Promise((resolve, reject) => {
+            connection.query(queryToGetDataFromDB, function (err, results) {
+                if (err) {
+                    reject(err);
+                }
+                resolve(results);
             });
-            let result = await promise;
-            sendResponse(result);
-            connection.end();
-        })();
+        });
+        let result = await promise;
+
+        console.log(result);
+
+        let images = [];
+        let evolutionImages = [];
+        let secondFormEvolutionImages = [];
+
+        result.forEach((elem, index) => {
+            images.push(fs.promises.readFile(`uploads/${result[index].Image}`));
+        })
+
+        result.forEach((elem, index) => {
+            evolutionImages.push(fs.promises.readFile(`uploads/${result[index].EvolutionImage}`));
+        })
+
+        result.forEach((elem, index) => {
+            if (result[index].SecondEvolutionImage != null) {
+                secondFormEvolutionImages.push(fs.promises.readFile(`uploads/${result[index].SecondEvolutionImage}`));
+            }
+        })
+
+        Promise.all(images).then(data => {
+
+            result.forEach((elem, index) => {
+                result[index].Image = data[index].toString('base64');
+            })
+
+            Promise.all(evolutionImages).then(data => {
+                result.forEach((elem, index) => {
+                    result[index].EvolutionImage = data[index].toString(`base64`);
+                });
+
+                let counterOfSecondForms = 0;
+
+                Promise.all(secondFormEvolutionImages).then(data =>{
+                    for (let i = 0; i < secondFormEvolutionImages.length; i++){
+                        if (result[i].SecondEvolutionImage != null) {
+                            result[i+counterOfSecondForms].SecondEvolutionImage = data[i].toString(`base64`);
+                        } else {
+                            counterOfSecondForms++;
+                        }
+                    }
+
+                    sendResponse(result);
+                    connection.end();
+                })
+            })
+        })
+    })();
 
     function sendResponse(response) {
             res.setHeader("Access-Control-Allow-Origin", "*");
@@ -166,97 +217,79 @@ app.listen(PORT, (error) => {
     error ? console.log(error): console.log("Listening port 3000");
 })
 
-// server.listen(PORT, 'localhost', (error) =>{
-//     error ? console.log(error): console.log("Listening port 3000");
-// });
+// Google disc related section
 
-
-// const server = http.createServer((req, res) => {
+// const { google } = require('googleapis');
+// const apikey = require('F:\\WebDev Projects\\Pokedex git\\Pokedex\\apikey.json');
+// const SCOPE = ['https://www.googleapis.com/auth/drive'];
 //
-//     const connection = mysql.createConnection({
-//         host: "localhost",
-//         user: "root",
-//         database: "pokedex",
-//         password: "root"
-//     });
+// const ReadSCOPE = ['https://www.googleapis.com/auth/drive.readonly',
+//                     'https://www.googleapis.com/auth/drive.metadata.readonly'];
+// //
+// const fs = require('fs');
+// const {version} = require("http-server/lib/core");
+// const {auth} = require("mysql/lib/protocol/Auth");
 //
-//     connection.connect(err => {
-//         if (err) {
-//             console.log(err);
-//             return err
-//         } else {
-//             console.log("Database works");
+// async function authorize(){
+//     const jwtClient = new google.auth.JWT(
+//         apikey.client_email,
+//         null,
+//         apikey.private_key,
+//         SCOPE
+//     );
+//     await jwtClient.authorize();
+//
+//     return jwtClient;
+// }
+//
+// async function uploadImages(authClient){
+//
+//     console.log("Upload started...")
+//     return new Promise((resolve, reject) =>{
+//         const drive = google.drive({version:`v3`, auth:authClient});
+//
+//         console.log(req.files[0]);
+//
+//         let imageMetaData = {
+//             name: `${req.files[0].originalname}`,
+//             parents:["1bFk_869-ZchOY_AL7QuHRJCjgqQbYO26"]
 //         }
+//
+//         drive.files.create({
+//             resource: imageMetaData,
+//             media:{
+//                 body: fs.createReadStream(`uploads/${req.files[0].filename}`),
+//                 mimeType: "image/*"
+//             },
+//             fields:"id"
+//         }, function (err, file){
+//             if (err){
+//                 return reject(err)
+//             }
+//             console.log("Uploaded")
+//             resolve(file)
+//         })
+//     })
+// }
+//
+// async function listFiles(authClient) {
+//     const drive = google.drive({version: 'v3', auth: authClient});
+//     const res = await drive.files.list({
+//         fields: 'nextPageToken, files(id, name)',
 //     });
-//
-//     if (req.method === "GET") {
-//        query = "SELECT * FROM pokemons";
-//         (async function () {
-//             let promise = new Promise((resolve, reject) => {
-//                 connection.query(query, function (err, results) {
-//                     if (err) console.log(err);
-//                     resolve(results);
-//                 });
-//             });
-//             let result = await promise;
-//             sendResponse(result);
-//             connection.end();
-//         })();
-//
-//         // Second version of the async code
-//
-//         // let promise = new Promise((resolve, reject) => {
-//         //     connection.query(query, function (err, results) {
-//         //         if (err) console.log(err);
-//         //         resolve(results);
-//         //     });
-//         // })
-//         // promise.then(result => {
-//         //     sendResponse(result);
-//         //     connection.end();
-//         // });
-//
-//         function sendResponse(response) {
-//             res.writeHead(200, {'Content-Type': 'application/json'});
-//             res.write(JSON.stringify(response));
-//             res.end();
-//         }
+//     const files = res.data.files;
+//     if (files.length === 0) {
+//         console.log('No files found.');
+//         return;
 //     }
 //
-//
-//     // else if (req.method === "POST"){
-//     //     let req.body;
-//     //     (async function (){
-//     //         // let promise = new Promise((resolve, reject) => {
-//     //         //     req.on("data", chunk =>{
-//     //         //     req.body += chunk;
-//     //         //     resolve(req.body);
-//     //         //     })
-//     //         //     // req.body = req.body;
-//     //         // });
-//     //         // await promise;
-//     //
-//     //
-//     //
-//     //         // req.body = JSON.parse(req.body);
-//     //         //
-//     //         // query = `INSERT INTO req.bodys (Title, Image, Description, Weaknesses, Types, Evolution, Height, Weight, Gender, Category, Abilities, Skills)
-//     //         //             VALUES ("${req.body.title}", "${req.body.image.name}", "${req.body.description}", "${req.body.weaknesses}", "${req.body.types}", "${req.body.evolution[0].title}",
-//     //         //             "${req.body.height}", "${req.body.weight}", "${req.body.gender}", "${req.body.category}", "${req.body.abilities}", "${req.body.skills[0].hp}")`;
-//     //         //
-//     //         // let promiseDB = new Promise((resolve, reject) => {
-//     //         //     connection.query(query, (err, results) => {
-//     //         //         if (err) console.log(err);
-//     //         //         console.log("Added data into DB")
-//     //         //         resolve(results)
-//     //         //     });
-//     //         // });
-//     //         // await promiseDB;
-//     //
-//     //         res.end();
-//     //         console.log("Closed connection")
-//     //     })();
-//     // }
-// });
+//     console.log('Files:');
+//     files.map((file) => {
+//         console.log(`${file.name} (${file.id})`);
+//     });
+// }
 
+// authorize().then(listFiles).catch(console.error);
+
+// await authorize().then(uploadImages).catch("Error", console.error());
 

@@ -25,11 +25,13 @@ function uploadImage(){ // Upload only evolution forms images
 
 // All dropdowns
 
-document.querySelectorAll(".dropdown-arrow").forEach(e => {
-    e.addEventListener("click", e => {
+document.querySelectorAll(".dropdown-arrow").forEach(ev => {
+    ev.addEventListener("click", e => {
         const clickedButton = e.target.parentElement.classList.item(0).split('-')[0];
+        let currentDropdown;
         document.querySelectorAll(".dropdown").forEach(e => {
             if (e.classList.contains(clickedButton + "-dropdown")){
+                currentDropdown = e;
                 if (e.style.display === 'block'){
                     e.style.display = "none";
                 } else{
@@ -38,6 +40,13 @@ document.querySelectorAll(".dropdown-arrow").forEach(e => {
                 }
             }
             e.style.display = "none";
+            window.addEventListener("click", function(event) {
+                if (event.target.parentElement == currentDropdown || event.target.parentElement == ev){
+                    return
+                } else {
+                    currentDropdown.style.display = "none";
+                }
+            });
         })
         document.querySelectorAll(`.${clickedButton}-drop-el`).forEach(e =>{
             e.addEventListener("click", () => {
@@ -119,6 +128,17 @@ function removeAttributeLevel(){
 }
 
 function setAttribute(){
+
+    currentAttribute = this.classList.item(0);
+    currentLevel = this.classList.item(2).split("-")[1];
+
+    listOfChosenAttribute = document.querySelectorAll(`.${currentAttribute}`);
+
+    for (let i = 0; i < listOfChosenAttribute.length; i++){
+        listOfChosenAttribute[i].style.background = "#D9D9D9";
+        listOfChosenAttribute[i].style.boxShadow = "inset 0px 4px 4px rgba(0, 0, 0, 0.25)";
+    }
+
     for (let i = 1; i <= +currentLevel; i++){
         document.querySelector(`.${currentAttribute}-${i}`).style.background = "rgba(51, 0, 255, 0.47)";
     }
@@ -127,7 +147,6 @@ function setAttribute(){
     for (let i = 0; i < listOfChosenAttribute.length; i++){
         listOfChosenAttribute[i].removeEventListener("mouseout", removeAttributeLevel);
         listOfChosenAttribute[i].removeEventListener("mouseover", showAttributeLevel);
-        listOfChosenAttribute[i].removeEventListener("click", setAttribute);
     }
 }
 
@@ -150,7 +169,7 @@ document.querySelector(".add-one-more-form-button").addEventListener("click", ()
 
     document.querySelector(".evolution-form-inner-wrapper").replaceChild(parentFormBlock, originEvolutionForm);
 
-    document.querySelector(".remove-evolution-form").addEventListener("click", () => {
+    document.querySelector(".remove-evolution-form img").addEventListener("click", () => {
         document.querySelector(".evolution-form-inner-wrapper").replaceChild(originEvolutionForm, parentFormBlock);
     })
 
@@ -223,7 +242,7 @@ document.querySelector(".add-one-more-form-button").addEventListener("click", ()
 
         removeFormButton.classList.add("remove-evolution-form");
         removeButtonImg.src = "images/minus.png";
-        removeButtonImg.style.height = "85%";
+        removeButtonImg.style.height = "100%";
         removeButtonImg.style.width = "7%";
         removeFormButton.appendChild(removeButtonImg);
 
@@ -251,6 +270,7 @@ async function sendData(e){
     })
     let result = await response;
     console.log(result);
+    location.reload();
 
 }
 
@@ -264,8 +284,6 @@ function getDataFromChosenFields(targetElement){
 }
 
 // TO DO
-//  window onclick to remove dropdowns
-//  refresh attributes
-// refresh the page after sending the form
-// favicon
 // show chosen dropdowns
+// Add animations
+//    : with pokeball

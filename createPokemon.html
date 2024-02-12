@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport", content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
     <link rel="stylesheet" href="css/stylesForCreatePokemon.css">
     <link href='https://fonts.googleapis.com/css?family=Josefin Slab' rel='stylesheet'>
     <title>Create Pokemon</title>
@@ -20,7 +21,7 @@
                         <label for="pokemon-main-image-input" id="pokemon-main-image-label" class="label primary">
                             <p>Add pokemon’s image</p>
                         </label>
-                        <input type="file" id="pokemon-main-image-input" name="mainImage" class="primary main-image-input" accept="image/*" required>
+                        <input type="file" id="pokemon-main-image-input" name="mainImage" class="primary main-image-input" accept="image/png, image/jpeg" required>
                     </div>
                     <div class="description">
                         <input name="description" placeholder="Enter pokemon’s description" class="primary" required>
@@ -99,8 +100,8 @@
                     </div>
                     <div class="parameters">
                         <div class="parameter-left-side">
-                            <input placeholder="Height" name="height" class="primary" required>
-                            <input placeholder="Weight" name="weight" class="primary" required>
+                            <input placeholder="Height, m" name="height" class="primary" required>
+                            <input placeholder="Weight, kg" name="weight" class="primary" required>
                         </div>
                         <div class="parameter-right-side">
                             <div class="gender-inner-wrapper">

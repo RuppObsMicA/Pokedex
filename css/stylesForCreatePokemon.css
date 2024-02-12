@@ -220,11 +220,13 @@ form{
 
 .remove-evolution-form{
     margin-top: 1%;
-    height: 20%;
-    cursor: pointer;
+    height: 1.8rem;
     align-items: center;
     align-content: center;
-    height: 22%;
+}
+
+.remove-evolution-form:hover{
+    cursor: pointer;
 }
 
 .evolution-form-name{

@@ -38,7 +38,7 @@ function addTitleAndId(number){
 }
 
 function addMainImage(number){
-    document.querySelector(".main-image").innerHTML = `<img src="uploads/${pokemons[number].Image}" width="100%" height="100%">`;
+    document.querySelector(".main-image").innerHTML = `<img src="data:image/png;base64, ${pokemons[number].Image}" width="100%" height="100%">`;
 }
 
 function addDescription(number){
@@ -88,8 +88,8 @@ function addSkills(number){
 }
 
 function add_Gender_Category_Abilities_Height_Weight(number){
-    document.querySelector(".height").innerHTML = `<b>Height:</b> <br> ${pokemons[number].Height}`;
-    document.querySelector(".weight").innerHTML = `<b>Weight:</b> <br> ${pokemons[number].Weight}`;
+    document.querySelector(".height").innerHTML = `<b>Height:</b> <br> ${pokemons[number].Height} m`;
+    document.querySelector(".weight").innerHTML = `<b>Weight:</b> <br> ${pokemons[number].Weight} kg`;
     document.querySelector(".gender").innerHTML = `<b>Gender:</b> <br> ${pokemons[number].Gender}`;
     document.querySelector(".category").innerHTML = `<b>Category:</b> <br> ${pokemons[number].Category.at(0.).toUpperCase()}${pokemons[number].Category.slice(1)}`;
 
@@ -114,18 +114,18 @@ document.querySelector(".evolution-arrow-backward").addEventListener("click", ch
 
 function changeEvolutionForm(){
     if (counterOfForms == 1){
-        document.querySelector(".evolution-picture").innerHTML = `<img src="uploads/${pokemons[IdOfCurrentPokemon].SecondEvolutionImage}" width="100%" height="100%">`;
+        document.querySelector(".evolution-picture").innerHTML = `<img src="data:image/png;base64, ${pokemons[IdOfCurrentPokemon].SecondEvolutionImage}" width="100%" height="100%">`;
         document.querySelector(".evolution-form-title").innerHTML = `${pokemons[IdOfCurrentPokemon].SecondEvolutionName}`;
         counterOfForms++;
     } else {
-        document.querySelector(".evolution-picture").innerHTML = `<img src="uploads/${pokemons[IdOfCurrentPokemon].EvolutionImage}" width="100%" height="100%">`;
+        document.querySelector(".evolution-picture").innerHTML = `<img src="data:image/png;base64, ${pokemons[IdOfCurrentPokemon].EvolutionImage}" width="100%" height="100%">`;
         document.querySelector(".evolution-form-title").innerHTML = `${pokemons[IdOfCurrentPokemon].EvolutionName}`;
         counterOfForms--;
     }
 }
 
 function addEvolutionImage(number){
-    document.querySelector(".evolution-picture").innerHTML = `<img src="uploads/${pokemons[number].EvolutionImage}" width="100%" height="100%">`;
+    document.querySelector(".evolution-picture").innerHTML = `<img src="data:image/png;base64, ${pokemons[number].EvolutionImage}" width="100%" height="100%">`;
     document.querySelector(".evolution-form-title").innerHTML = `${pokemons[number].EvolutionName}`;
     counterOfForms = 1;
 }

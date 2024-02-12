@@ -133,7 +133,7 @@
 }
 
 .evolution-forms{
-    height: 37%;
+    height: 36%;
     display: flex;
     background-color:rgba(171, 11, 11, 0);
     border: 0;
@@ -190,7 +190,7 @@
 }
 
 .attributes{
-    height: 24%;
+    height: 23%;
     margin: 1% auto;
     display: flex;
     width: 88%;
@@ -237,7 +237,7 @@
 
 .parameters{
     display: flex;
-    height: 25%;
+    height: 24%;
     margin: 0 auto;
     width: 90%;
     font-size: 1.5rem;
